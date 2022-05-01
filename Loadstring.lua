@@ -1,0 +1,1 @@
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/Uvxtq/Kaoru-Hub/main/Loader.lua'),true))()
