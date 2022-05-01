@@ -1,8 +1,10 @@
 {
     "robloxLsp.diagnostics.disable": [
-        "deprecated"
+        "deprecated",
+        "undefined-global"
     ],
     "robloxLsp.diagnostics.globals": [
-        "getgenv"
+        "getgenv",
+        "request"
     ]
 }
