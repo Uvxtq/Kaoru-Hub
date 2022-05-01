@@ -19,6 +19,13 @@ for i,v in pairs(Games.tree) do
     end
 end
 
+local dummy = Instance.new("BindableFunction")
+function bindable.OnInvoke(response)
+    if response == "Okay!" then
+        setclipboard('https://discord.gg/zkvPrg89jD')
+    end
+end
+
 local bindable = Instance.new("BindableFunction")
 function bindable.OnInvoke(response)
     if response == "Okay!" then
@@ -43,7 +50,14 @@ function bindable.OnInvoke(response)
         
         -- Start
         if not RequestFunction then
-            return print("Your executor does not support http requests.")
+            return game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "your executor does not support http requests.",
+                Text = "Wanna copy the discord link instead?",
+                Duration = 7,
+                Callback = dummy,
+                Button1 = "Okay!",
+                Button2 = "No"
+            })
         end
         
         for i = 6453, 6464 do
