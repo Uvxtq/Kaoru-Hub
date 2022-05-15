@@ -1,8 +1,10 @@
-if not syn or not protectgui then
-    getgenv().protectgui = function()end
-end
-local Library = loadstring(game:HttpGet('https://lindseyhost.com/UI/LinoriaLib.lua'))()
-Library:SetWatermark("github.com/Averiias")
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local function service(...) return game:GetService(...) end
+
+local MarketplaceService = service("MarketplaceService")
+
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Universal: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name, SaveConfig = true, ConfigFolder = "Kaoru Hub Universal: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name})
 
 local Camera = workspace.CurrentCamera
 local Players = game:GetService("Players")
@@ -19,6 +21,8 @@ local GetPartsObscuringTarget = Camera.GetPartsObscuringTarget
 local FindFirstChild = game.FindFirstChild
 local RenderStepped = RunService.RenderStepped
 local GuiInset = GuiService.GetGuiInset
+
+local Toggles = nil
 
 local resume = coroutine.resume 
 local create = coroutine.create
@@ -98,29 +102,6 @@ local function getClosestPlayer()
     return Closest
 end
 
-local Window = Library:CreateWindow("Universal Silent Aim")
-
-local GeneralTab = Window:AddTab("General")
-local MainBOX = GeneralTab:AddLeftTabbox("Main")
-do
-    local Main = MainBOX:AddTab("Main")
-    Main:AddToggle("aim_Enabled", {Text = "Enabled"})
-    Main:AddToggle("TeamCheck", {Text = "Team Check"})
-    Main:AddToggle("VisibleCheck", {Text = "Visible Check"})
-    Main:AddDropdown("TargetPart", {Text = "Target Part", Default = 1, Values = {
-        "Head", "HumanoidRootPart", "Random"
-    }})
-    Main:AddDropdown("Method", {Text = "Silent Aim Method", Default = 1, Values = {
-        "Raycast","FindPartOnRay",
-        "FindPartOnRayWithWhitelist",
-        "FindPartOnRayWithIgnoreList",
-        "Mouse.Hit/Target"
-    }})
-end
-
-local FieldOfViewBOX = GeneralTab:AddLeftTabbox("Field Of View")
-local MiscellaneousBOX = GeneralTab:AddLeftTabbox("Miscellaneous")
-
 local fov_circle = Drawing.new("Circle")
 fov_circle.Thickness = 1
 fov_circle.NumSides = 100
@@ -129,36 +110,115 @@ fov_circle.Filled = false
 fov_circle.Visible = false
 fov_circle.ZIndex = 999
 fov_circle.Transparency = 1
-fov_circle.Color = Color3.fromRGB(54, 57, 241)
-    
-local mouse_box = Drawing.new("Square")
-mouse_box.Visible = true 
-mouse_box.ZIndex = 999 
-mouse_box.Color = Color3.fromRGB(54, 57, 241)
-mouse_box.Thickness = 20 
-mouse_box.Size = Vector2.new(20, 20)
-mouse_box.Filled = true 
+fov_circle.Color = Color3.fromRGB(255, 255, 255)
 
 local PredictionAmount = 0.165
 
 do
-    local Main = FieldOfViewBOX:AddTab("Field Of View")
-    Main:AddToggle("fov_Enabled", {Text = "Enabled"})
-    Main:AddSlider("Radius", {Text = "Radius", Min = 0, Max = 1000, Default = 180, Rounding = 0}):OnChanged(function()
-        fov_circle.Radius = Options.Radius.Value
-    end)
-    Main:AddToggle("Visible", {Text = "Visible"}):AddColorPicker("Color", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-        fov_circle.Visible = Toggles.Visible.Value
-    end)
-    Main:AddToggle("MousePosition", {Text = "Show Fake Mouse Position"}):AddColorPicker("MouseVisualizeColor", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-        mouse_box.Visible = Toggles.MousePosition.Value 
-    end)
-    
-    local PredictionTab = MiscellaneousBOX:AddTab("Prediction")
-    PredictionTab:AddToggle("Prediction", {Text = "Mouse.Hit/Target Prediction"})
-    PredictionTab:AddSlider("Amount", {Text = "Prediction Amount", Min = 0.165, Max = 1, Default = 0.165, Rounding = 3}):OnChanged(function()
-        PredictionAmount = Options.Amount.Value
-    end)
+    local Main = Window:MakeTab({
+        Name = "Main",
+        Icon = "rbxassetid://8945416692",
+        PremiumOnly = false
+    })
+
+    local FieldaOfView = Window:MakeTab({
+        Name = "Field Of View",
+        Icon = "rbxassetid://8945416692",
+        PremiumOnly = false
+    })
+
+    local Prediction = Window:MakeTab({
+        Name = "Prediction",
+        Icon = "rbxassetid://8945416692",
+        PremiumOnly = false
+    })
+
+    Main:AddToggle({
+        Name = "Enabled",
+        Default = false,
+    })
+
+    Main:AddToggle({
+        Name = "Team Check",
+        Default = false,
+    })
+
+    Main:AddToggle({
+        Name = "Visible Check",
+        Default = false,
+    })
+    Main:AddDropdown({
+        Name = "Target Part",
+        Default = "Head",
+        Options = {
+            "Head",
+            "HumanoidRootPart",
+            "Random"
+        }
+    }) 
+
+    Main:AddDropdown({
+        Name = "Silent Aim Method",
+        Default = "Raycast",
+        Options = {
+            "Raycast", "FindPartOnRay",
+            "FindPartOnRayWithWhitelist",
+            "FindPartOnRayWithIgnoreList",
+            "Mouse.Hit/Target"
+        }
+    })
+
+    FieldaOfView:AddToggle({
+        Name = "Enabled",
+        Default = false,
+    })
+
+    FieldaOfView:AddToggle({
+        Name = "Visible",
+        Default = false,
+        Callback = function()
+            fov_circle.Visible = Toggles.Visible.Value
+        end
+    })
+
+    FieldaOfView:AddColorpicker({
+        Name = "Select Your Field Of View Color",
+        Default = Color3.fromRGB(255, 255, 255),
+        Callback = function(Value)
+            fov_circle.Color = Value
+        end	  
+    })
+
+    FieldaOfView:AddSlider({
+        Name = "Radius",
+        Min = 0,
+        Max = 1000,
+        Default = 180,
+        Color = Color3.fromRGB(255,255,255),
+        Increment = 1,
+        ValueName = "Radius",
+        Callback = function()
+            fov_circle.Radius = Options.Radius.Value
+        end
+    })
+
+    Prediction:AddToggle({
+        Name = "Mouse.Hit/Target Prediction",
+        Default = false
+    })
+
+    Prediction:AddSlider({
+        Name = "Prediction",
+        Min = 0.165,
+        Max = 1,
+        Default = 0.165,
+        Color = Color3.fromRGB(255,255,255),
+        Increment = 0.001,
+        ValueName = "Prediction",
+        Callback = function()
+            PredictionAmount = Options.Amount.Value
+        end
+    })
 end
 
 resume(create(function()
@@ -281,3 +341,5 @@ oldIndex = hookmetamethod(game, "__index", function(self, Index)
 
     return oldIndex(self, Index)
 end)
+
+

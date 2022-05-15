@@ -7,7 +7,7 @@ local HttpService = service("HttpService")
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name, SaveConfig = true, ConfigFolder = "Kaoru Hub Free: Weapon Fighting Simulator"})
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name, SaveConfig = true, ConfigFolder = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name})
 
 local Main = Window:MakeTab({
 	Name = "Main",
