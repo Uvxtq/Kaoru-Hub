@@ -1,283 +1,181 @@
-if not syn or not protectgui then
-    getgenv().protectgui = function()end
-end
-local Library = loadstring(game:HttpGet('https://lindseyhost.com/UI/LinoriaLib.lua'))()
-Library:SetWatermark("github.com/Averiias")
+local function service(...) return game:GetService(...) end
 
-local Camera = workspace.CurrentCamera
-local Players = game:GetService("Players")
+--Main
+local runser = game:GetService("RunService")
+local lplr = game.Players.LocalPlayer
+local mouse = lplr:GetMouse()
+local plrs = game:GetService("Players")
+local uis = game:GetService("UserInputService")
+local bhop = false
+local mouse = game.Players.LocalPlayer:GetMouse()
+
+local LegitAimbotBool = false
+local LegitAimAt
+
+-- Services
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local GuiService = game:GetService("GuiService")
+local Players = service("Players")
+local MarketplaceService = service("MarketplaceService")
+local ReplicatedStorage = service("ReplicatedStorage")
+local HttpService = service("HttpService")
 
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+-- Environment 
+local getrawmetatable = getrawmetatable or false
+local mousemove = mousemove or mousemoverel or mouse_move or false
+local getsenv = getsenv or false
+local listfiles = listfiles or listdir or syn_io_listdir or false
+local isfolder = isfolder or false
+local hookfunc = hookfunc or hookfunction or replaceclosure or false
 
-local GetChildren = game.GetChildren
-local WorldToScreen = Camera.WorldToScreenPoint
-local WorldToViewportPoint = Camera.WorldToViewportPoint
-local GetPartsObscuringTarget = Camera.GetPartsObscuringTarget
-local FindFirstChild = game.FindFirstChild
-local RenderStepped = RunService.RenderStepped
-local GuiInset = GuiService.GetGuiInset
+if (getrawmetatable == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
+if (mousemove == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
+if (getsenv == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
+if (listfiles == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
+if (isfolder == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
+if (hookfunc == false) then return game.Players.LocalPlayer:Kick("Exploit not supported!") end
 
-local resume = coroutine.resume 
-local create = coroutine.create
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Pawel12d/hexagon/main/scripts/ESP.lua"))()
 
-local ValidTargetParts = {"Head", "HumanoidRootPart"};
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local function getPositionOnScreen(Vector)
-    local Vec3, OnScreen = WorldToScreen(Camera, Vector)
-    return Vector2.new(Vec3.X, Vec3.Y), OnScreen
+local GameName = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name
+local Window = OrionLib:MakeWindow({Name = GameName, SaveConfig = true, ConfigFolder = GameName})
+
+local Main = Window:MakeTab({
+	Name = "ESP",
+	Icon = "rbxassetid://8945416692",
+	PremiumOnly = false
+})
+
+-- Functions
+local function RandomString(length, strings)
+	local strings = strings or {
+		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
+		"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+		"0","1","2","3","4","5","6","7","8","9",
+	}
+	local output = ""
+	for i = 1,length do
+		output = tostring(output..""..strings[math.random(1,#strings)])
+		if i == length then
+			return output
+		end
+	end
 end
 
-local function ValidateArguments(Args, RayMethod)
-    local Matches = 0
-    if #Args < RayMethod.ArgCountRequired then
-        return false
+local function IsAlive(plr)
+	if plr and plr.Character and plr.Character.FindFirstChild(plr.Character, "Humanoid") and plr.Character.Humanoid.Health > 0 then
+		return true
+	end
+
+	return false
+end
+
+local function IsVisible(pos, ignoreList)
+	return #workspace.CurrentCamera:GetPartsObscuringTarget({LocalPlayer.Character.Head.Position, pos}, ignoreList) == 0 and true or false
+end
+
+local function GetTeam(plr)
+	return game.Teams[plr.Team.Name]
+end
+
+Main:AddToggle({
+	Name = "Enabled",
+	Default = false,
+	Callback = function(val)
+        ESP.Enabled = val
     end
-    for Pos, Argument in next, Args do
-        if typeof(Argument) == RayMethod.Args[Pos] then
-            Matches = Matches + 1
-        end
+})
+
+Main:AddToggle({
+	Name = "Info",
+	Default = false,
+	Callback = function(val)
+	    ESP.ShowInfo = val
     end
-    return Matches >= RayMethod.ArgCountRequired
-end
+})
 
-local function getDirection(Origin, Position)
-    return (Position - Origin).Unit * 1000
-end
-
-local function getMousePosition()
-    return Vector2.new(Mouse.X, Mouse.Y)
-end
-
-local function IsPlayerVisible(Player)
-    local PlayerCharacter = Player.Character
-    local LocalPlayerCharacter = LocalPlayer.Character
-    
-    if not (PlayerCharacter or LocalPlayerCharacter) then return end 
-    
-    local PlayerRoot = FindFirstChild(PlayerCharacter, Options.TargetPart.Value) or FindFirstChild(PlayerCharacter, "HumanoidRootPart")
-    
-    if not PlayerRoot then return end 
-    
-    local CastPoints, IgnoreList = {PlayerRoot.Position, LocalPlayerCharacter, PlayerCharacter}, {LocalPlayerCharacter, PlayerCharacter}
-    local ObscuringObjects = #GetPartsObscuringTarget(Camera, CastPoints, IgnoreList)
-    
-    return ((ObscuringObjects == 0 and true) or (ObscuringObjects > 0 and false))
-end
-
-local function getClosestPlayer()
-    if not Options.TargetPart.Value then return end
-    local Closest
-    local DistanceToMouse
-    for _, Player in next, GetChildren(Players) do
-        if Player == LocalPlayer then continue end
-        if Toggles.TeamCheck.Value and Player.Team == LocalPlayer.Team then continue end
-
-        local Character = Player.Character
-        if not Character then continue end
-        
-        if Toggles.VisibleCheck.Value and not IsPlayerVisible(Player) then continue end
-
-        local HumanoidRootPart = FindFirstChild(Character, "HumanoidRootPart")
-        local Humanoid = FindFirstChild(Character, "Humanoid")
-
-        if not HumanoidRootPart or not Humanoid or Humanoid and Humanoid.Health <= 0 then continue end
-
-        local ScreenPosition, OnScreen = getPositionOnScreen(HumanoidRootPart.Position)
-
-        if not OnScreen then continue end
-
-        local Distance = (getMousePosition() - ScreenPosition).Magnitude
-        if Distance <= (DistanceToMouse or (Toggles.fov_Enabled.Value and Options.Radius.Value) or 2000) then
-            Closest = ((Options.TargetPart.Value == "Random" and Character[ValidTargetParts[math.random(1, #ValidTargetParts)]]) or Character[Options.TargetPart.Value])
-            DistanceToMouse = Distance
-        end
+Main:AddToggle({
+	Name = "Tracers",
+	Default = false,
+	Callback = function(val)
+	    ESP.Tracers = val
     end
-    return Closest
-end
+})
 
-local Window = Library:CreateWindow("Universal Silent Aim")
-
-local GeneralTab = Window:AddTab("General")
-local MainBOX = GeneralTab:AddLeftTabbox("Main")
-do
-    local Main = MainBOX:AddTab("Main")
-    Main:AddToggle("aim_Enabled", {Text = "Enabled"})
-    Main:AddToggle("TeamCheck", {Text = "Team Check"})
-    Main:AddToggle("VisibleCheck", {Text = "Visible Check"})
-    Main:AddDropdown("TargetPart", {Text = "Target Part", Default = 1, Values = {
-        "Head", "HumanoidRootPart", "Random"
-    }})
-    Main:AddDropdown("Method", {Text = "Silent Aim Method", Default = 1, Values = {
-        "Raycast","FindPartOnRay",
-        "FindPartOnRayWithWhitelist",
-        "FindPartOnRayWithIgnoreList",
-        "Mouse.Hit/Target"
-    }})
-end
-
-local FieldOfViewBOX = GeneralTab:AddLeftTabbox("Field Of View")
-local MiscellaneousBOX = GeneralTab:AddLeftTabbox("Miscellaneous")
-
-local fov_circle = Drawing.new("Circle")
-fov_circle.Thickness = 1
-fov_circle.NumSides = 100
-fov_circle.Radius = 180
-fov_circle.Filled = false
-fov_circle.Visible = false
-fov_circle.ZIndex = 999
-fov_circle.Transparency = 1
-fov_circle.Color = Color3.fromRGB(54, 57, 241)
-    
-local mouse_box = Drawing.new("Square")
-mouse_box.Visible = true 
-mouse_box.ZIndex = 999 
-mouse_box.Color = Color3.fromRGB(54, 57, 241)
-mouse_box.Thickness = 20 
-mouse_box.Size = Vector2.new(20, 20)
-mouse_box.Filled = true 
-
-local PredictionAmount = 0.165
-
-do
-    local Main = FieldOfViewBOX:AddTab("Field Of View")
-    Main:AddToggle("fov_Enabled", {Text = "Enabled"})
-    Main:AddSlider("Radius", {Text = "Radius", Min = 0, Max = 1000, Default = 180, Rounding = 0}):OnChanged(function()
-        fov_circle.Radius = Options.Radius.Value
-    end)
-    Main:AddToggle("Visible", {Text = "Visible"}):AddColorPicker("Color", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-        fov_circle.Visible = Toggles.Visible.Value
-    end)
-    Main:AddToggle("MousePosition", {Text = "Show Fake Mouse Position"}):AddColorPicker("MouseVisualizeColor", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-        mouse_box.Visible = Toggles.MousePosition.Value 
-    end)
-    
-    local PredictionTab = MiscellaneousBOX:AddTab("Prediction")
-    PredictionTab:AddToggle("Prediction", {Text = "Mouse.Hit/Target Prediction"})
-    PredictionTab:AddSlider("Amount", {Text = "Prediction Amount", Min = 0.165, Max = 1, Default = 0.165, Rounding = 3}):OnChanged(function()
-        PredictionAmount = Options.Amount.Value
-    end)
-end
-
-resume(create(function()
-    RenderStepped:Connect(function()
-        if Toggles.MousePosition.Value then 
-            if Toggles.aim_Enabled.Value == true and Options.Method.Value == "Mouse.Hit/Target" then
-                mouse_box.Color = Options.MouseVisualizeColor.Value 
-                
-                mouse_box.Visible = ((getClosestPlayer() and true) or false)
-                mouse_box.Position = ((getClosestPlayer() and Vector2.new(WorldToViewportPoint(Camera, getClosestPlayer().Parent.PrimaryPart.Position).X, WorldToViewportPoint(Camera, getClosestPlayer().Parent.PrimaryPart.Position).Y)) or Vector2.new(-9000, -9000)) -- I am too lazy to write this differently - xaxa
-            end
-        end
-        
-        if Toggles.Visible.Value then 
-            fov_circle.Visible = Toggles.Visible.Value
-            fov_circle.Color = Options.Color.Value
-            fov_circle.Position = getMousePosition() + Vector2.new(0, 36)
-        end
-    end)
-end))
-
-local ExpectedArguments = {
-    FindPartOnRayWithIgnoreList = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Ray", "table", "boolean", "boolean"
-        }
-    },
-    FindPartOnRayWithWhitelist = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Ray", "table", "boolean"
-        }
-    },
-    FindPartOnRay = {
-        ArgCountRequired = 2,
-        Args = {
-            "Instance", "Ray", "Instance", "boolean", "boolean"
-        }
-    },
-    Raycast = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Vector3", "Vector3", "RaycastParams"
-        }
-    }
-}
-
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(...)
-    local Method = getnamecallmethod()
-    local Arguments = {...}
-    local self = Arguments[1]
-
-    if Toggles.aim_Enabled.Value and self == workspace then
-        if Method == "FindPartOnRayWithIgnoreList" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithIgnoreList) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif Method == "FindPartOnRayWithWhitelist" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithWhitelist) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif (Method == "FindPartOnRay" or Method == "findPartOnRay") and Options.Method.Value:lower() == Method:lower() then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRay) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif Method == "Raycast" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.Raycast) then
-                local A_Origin = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    Arguments[3] = getDirection(A_Origin, HitPart.Position)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        end
+Main:AddToggle({
+	Name = "Boxes",
+	Default = false,
+	Callback = function(val)
+        ESP.Boxes = val
     end
-    return oldNamecall(...)
-end)
+})
 
-local oldIndex = nil 
-oldIndex = hookmetamethod(game, "__index", function(self, Index)
-    if self == Mouse and (Index == "Hit" or Index == "Target") then 
-        if Toggles.aim_Enabled.Value == true and Options.Method.Value == "Mouse.Hit/Target" and getClosestPlayer() then
-            local HitPart = getClosestPlayer()
-
-            return ((Index == "Hit" and ((Toggles.Prediction.Value == false and HitPart.CFrame) or (Toggles.Prediction.Value == true and (HitPart.CFrame + (HitPart.Velocity * PredictionAmount))))) or (Index == "Target" and HitPart))
-        end
+Main:AddToggle({
+	Name = "Show Team",
+	Default = false,
+	Callback = function(val)
+        ESP.ShowTeam = val
     end
+})
 
-    return oldIndex(self, Index)
-end)
+Main:AddToggle({
+	Name = "Use Team Color",
+	Default = false,
+	Callback = function(val)
+        ESP.UseTeamColor = val
+    end
+})
+
+Main:AddColorpicker({
+    Name = "Team Color",
+    Default = Color3.new(0,1,0),
+    Callback = function(val)
+        ESP.TeamColor = val
+    end	  
+})
+
+Main:AddColorpicker({
+    Name = "Enemy Color",
+    Default = Color3.new(1,0,0),
+    Callback = function(val)
+        ESP.EnemyColor = val
+    end	  
+})
+
+OrionLib:Init()
+
+--[[
+Main:AddToggle({
+	Name = "Info Settings: Name",
+	Default = false,
+	Callback = function(val)
+        ESP.Info.Name = (table.find(val, "Name") and true) or false
+    end
+})
+
+Main:AddToggle({
+	Name = "Info Settings: Health",
+	Default = false,
+	Callback = function(val)
+        ESP.Info.Health = (table.find(val, "Health") and true) or false
+    end
+})
+
+Main:AddToggle({
+	Name = "Info Settings: Weapons",
+	Default = false,
+	Callback = function(val)
+        ESP.Info.Weapons = (table.find(val, "Weapons") and true) or false
+    end
+})
+
+Main:AddToggle({
+	Name = "Info Settings: Distance",
+	Default = false,
+	Callback = function(val)
+        ESP.Info.Distance = (table.find(val, "Distance") and true) or false
+    end
+})
+]]
