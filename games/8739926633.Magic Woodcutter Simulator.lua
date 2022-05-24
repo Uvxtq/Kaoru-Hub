@@ -1,156 +1,324 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
--- // WAITS FOR GAME TO BE LOADED THEN EXECUTES
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: Weapon Fighting Simulator", SaveConfig = true, ConfigFolder = "Kaoru Hub Free: Weapon Fighting Simulator"})
 
-repeat wait() until game:IsLoaded()
-
--- // MERCURY LOADSTRING
-
-local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/Uvxtq/lua/main/Updated%20UI%20Library.lua"))()
-
--- // GUI
-local GUI = Mercury:Create{
-    Name = "Kaoru Hub",
-    Size = UDim2.fromOffset(600, 400),
-    Theme = Mercury.Themes.Dark,
-    Link = "https://raw.githubusercontent.com/Uvxtq/lua/main/games/Anime%20Battle%20Tycoon.lua"
-}
-
--- // TABS
-local Main = GUI:Tab{
+local Main = Window:MakeTab({
 	Name = "Main",
-	Icon = "rbxassetid://8945416692"
-}
- 
-local Egg = GUI:Tab{
-	Name = "Egg",
-	Icon = "rbxassetid://8945455556"
-}
+	Icon = "rbxassetid://8945416692",
+	PremiumOnly = false
+})
 
-local LocalPlayer = GUI:Tab{
+local LocalPlayer = Window:MakeTab({
 	Name = "LocalPlayer",
-	Icon = "rbxassetid://8945470040"
-}
+	Icon = "rbxassetid://8945470040",
+	PremiumOnly = false
+})
 
-local Teleport = GUI:Tab{
+local Egg = Window:MakeTab({
+	Name = "Egg",
+	Icon = "rbxassetid://8945455556",
+	PremiumOnly = false
+})
+
+local Teleport = Window:MakeTab({
 	Name = "Teleport",
-	Icon = "rbxassetid://8945517811"
-}
+	Icon = "rbxassetid://8945517811",
+	PremiumOnly = false
+})
 
-local Extra = GUI:Tab{
+local Extra = Window:MakeTab({
 	Name = "Extra",
-	Icon = "rbxassetid://8950218710"
-}
+	Icon = "rbxassetid://8950218710",
+	PremiumOnly = false
+})
 
-Main:button{
-	Name = "Open Shop GUI",
-	StartingState = false,
-	Description = nil,
+local Discord = Window:MakeTab({
+	Name = "Discord",
+	Icon = "rbxassetid://8950218710",
+	PremiumOnly = false
+})
+
+
+local function eggs()
+    eggs = {}
+    for i,v in pairs(workspace.Fight["FightArea_1_300"].Gamble:GetChildren()) do
+        if v:IsA("Part") then
+            table.insert(eggs,v.Name)
+        end
+    end
+    return eggs
+end
+
+
+local ts = game:GetService("TweenService")
+local hum = game.Players.LocalPlayer.Character.HumanoidRootPart
+local plr = game:GetService("Players").LocalPlayer
+local rep = game:GetService("ReplicatedStorage")
+local wrk = game:GetService("Workspace")
+local rs = game:GetService("RunService")
+local vu = game:GetService("VirtualUser")
+
+pcall(function()
+	for i,v in pairs(getconnections(plr.Idled)) do
+		v:Disable()
+	end
+end)
+
+Extra:AddToggle({
+	Name = "Auto Spin Weel",
+	Default = false,
 	Callback = function()
-    for _,v in pairs(game:GetService("Workspace").Map["Upgrade_Part"]:GetDescendants()) do
-        if v:IsA("TouchTransmitter") then
-            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0)
-        wait()
-            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1)
+    getgenv().spin = not getgenv().spin;
+    while (getgenv().spin and wait(5)) do
+        spinn = {1, 2, 3, 4, 5};
+        for i,v in pairs(spinn) do
+            rep.CommonLibrary.Tool.RemoteManager.Funcs.DataPullFunc:InvokeServer("WheelRollChannel",v)
         end
     end
 end;
-}
+})
 
-Extra:Toggle{
-	Name = "Auto Claim Daily Rewards",
-	StartingState = false,
-	Description = nil,
-	Callback = function()
-    getgenv().daily = not getgenv().daily
-    while (getgenv().daily and wait()) do
-        for _,v in pairs(game:GetService("Workspace").Map["DailyReward_Part"]:GetDescendants()) do
-            if v:IsA("TouchTransmitter") then
-                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0)
-            wait()
-                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1)
-            end
-        end
-    end
-end;
-}
-
-Main:Toggle{
-	Name = "Auto Farm",
-	StartingState = false,
-	Description = nil,
-	Callback = function()
-        getgenv().farmer = not getgenv().farmer
-        while (getgenv().farmer and wait()) do
-            local player = game.Players.LocalPlayer
-            local nearest = nil
-            for i,v in pairs(game:GetService("Workspace").TargetStorage:GetDescendants()) do
-                if v:IsA("ClickDetector") then
-                    if nearest == nil or (player.Character:WaitForChild("HumanoidRootPart").Position - v.TargetPos.Value).Magnitude < (player.Character:WaitForChild("HumanoidRootPart").Position - nearest.Value).Magnitude then
-                        nearest = v.TargetPos
-                    end
+Main:AddToggle({
+	Name = "Auto Farm 'Nearest' HP (Recommended)",
+	Default = false,
+	Callback = function(v)
+        _G.Farm = v
+        local plrs = hum
+        -- // Gets the nearest thing
+        function getNear()
+            local near;
+            local nearr = math.huge
+        
+            for i, v in pairs(wrk.Fight.ClientChests:GetChildren()) do
+                if (plrs.Position - v.Root.Position).Magnitude < nearr then
+                    near = v
+                    nearr = (plrs.Position - v.Root.Position).Magnitude
                 end
             end
-        fireclickdetector(nearest.Parent) 
-        repeat wait() until not v or not getgenv().farmer
-        wait(0.5)
-    end
-end
-}
+            return near
+        end
+        -- // Attacks and tps to it
+        while task.wait() do
+            if not _G.Farm then break end;
+        pcall(function()
+            local nearest = getNear()
+            
+            plrs.CFrame = nearest.Root.CFrame * CFrame.new(0,0,10)
+            wait(.2)
 
-Main:Toggle{
-	Name = "Auto Sell",
-	StartingState = false,
-	Description = nil,
+            workspace.Fight.Events.FightAttack:InvokeServer(0,nearest.Name)   
+            
+            repeat task.wait()
+                plrs.CFrame = nearest.Root.CFrame * CFrame.new(0,0,10)
+            until nearest.Root == nil or not _G.Farm
+        end)
+    end
+end;
+})
+
+Main:AddToggle({
+	Name = "Auto Farm 'Highest' HP",
+	Default = false,
+	Callback = function(v)
+    _G.Farm = v
+    local plrs = hum
+    function getHighest()
+        local high = {}
+        for i, v in pairs(wrk.Fight.Chests:GetChildren()) do
+            for a, b in pairs(wrk.Fight.ClientChests:GetChildren()) do
+                if v.Name == b.Name then
+                    table.insert(high,v.ChestHp.Value)
+                    table.sort(high, function(a,b) return a > b end)
+                end
+            end
+        end
+
+        for a, b in pairs(wrk.Fight.Chests:GetChildren()) do
+            if high[1] == b.ChestHp.Value then
+                return b.Name
+            end
+        end    
+    end
+    while task.wait() do
+        if not _G.Farm then break end
+        pcall(function()
+            local highest = getHighest()
+
+            plrs.CFrame = wrk.Fight.ClientChests[highest].Root.CFrame * CFrame.new(0,0,10)
+            wait(.2)
+
+            workspace.Fight.Events.FightAttack:InvokeServer(0,highest)
+
+            repeat task.wait()
+                    plrs.CFrame = wrk.Fight.ClientChests[highest].Root.CFrame * CFrame.new(0,0,10)
+            until not wrk.Fight.ClientChests[highest] or not _G.Farm
+        end)
+    end
+end;
+})
+
+Main:AddToggle({
+	Name = "Auto Farm 'Lowest' HP",
+	Default = false,
+	Callback = function(v)
+    _G.Farm = v
+    local plrs = hum
+    function getLowest()
+        local low = {}
+        for i, v in pairs(wrk.Fight.Chests:GetChildren()) do
+            for a, b in pairs(wrk.Fight.ClientChests:GetChildren()) do
+                if v.Name == b.Name then
+                    table.insert(low,v.ChestHp.Value)
+                    table.sort(low, function(a,b) return a < b end)
+                end
+            end
+        end
+        for a, b in pairs(wrk.Fight.Chests:GetChildren()) do
+            if low[1] == b.ChestHp.Value then
+                return b.Name
+            end
+        end    
+    end
+    while task.wait() do
+        if not _G.Farm then break end
+        pcall(function()
+            local lowest = getLowest()
+
+            plrs.CFrame = wrk.Fight.ClientChests[lowest].Root.CFrame * CFrame.new(0,0,10)
+                wait(.2)
+
+            workspace.Fight.Events.FightAttack:InvokeServer(0,lowest)
+
+            repeat task.wait()
+                    plrs.CFrame = wrk.Fight.ClientChests[lowest].Root.CFrame * CFrame.new(0,0,10)
+            until not wrk.Fight.ClientChests[lowest] or not _G.Farm
+        end)
+    end
+end;
+})
+
+Main:AddButton({
+	Name = "Only Toggle this when you are in a boss arena",
+	Callback = function(v)
+        _G.Farm = v
+        local plrs = hum
+        -- // Gets the nearest thing
+        function getNear()
+            local near;
+            local nearr = 500
+        
+            for i, v in pairs(wrk.Fight.ClientChests:GetChildren()) do
+                if (plrs.Position - v.Root.Position).Magnitude < nearr then
+                    near = v
+                    nearr = (plr.Position - v.Root.Position).Magnitude
+                end
+            end
+            return near
+        end
+        -- // Attacks and tps to it
+        pcall(function()
+            local nearest = getNear()
+            
+            plrs.CFrame = nearest.Root.CFrame * CFrame.new(0,35,10)
+            wait(.2)
+
+            workspace.Fight.Events.FightAttack:InvokeServer(0,nearest.Name)
+            
+        repeat task.wait()
+            plrs.CFrame = nearest.Root.CFrame * CFrame.new(0,35,10)
+        until nearest.Root == nil or not _G.Farm
+    end)
+end;
+})
+
+Main:AddToggle({
+	Name = "Auto Collect",
+	Default = false,
 	Callback = function()
-    getgenv().sell = not getgenv().sell
-    while (getgenv().sell and wait()) do
-        for _,v in pairs(game:GetService("Workspace").Map["Sell_Part"]:GetDescendants()) do
-            if v:IsA("TouchTransmitter") then
-                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0)
-            wait()
-                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1)
+        getgenv().collect = not getgenv().collect
+        local plrs = hum
+        while (getgenv().collect and wait(0.1)) do
+        for i, v in pairs(wrk.Rewards:GetChildren()) do
+            if v ~= nil then
+                v.CFrame = plrs.CFrame
             end
         end
     end
-end 
-}
+end;
+})
 
-Main:Toggle{
-	Name = "Auto Buy Upgrades",
-	StartingState = false,
-	Description = nil,
+Main:AddToggle({
+	Name = "Auto Equip Best",
+	Default = false,
 	Callback = function()
-    getgenv().upgrades = not getgenv().upgrades
-    while (getgenv().upgrades and wait()) do
-    upgrades = {"Rank_Upgrade_Request", "Capacity_Upgrade_Request", };
-        for i,v in pairs(upgrades) do
-            local args = {[1] = {[1] = v}}
-            game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
+    getgenv().best = not getgenv().best
+    while (getgenv().best and wait(15)) do
+        local ohString1 = "ArtifactUnequipAllChannel"
+        rep.CommonLibrary.Tool.RemoteManager.Funcs.DataPullFunc:InvokeServer(ohString1)
+    wait()
+        local ohString1 = "ArtifactEquipBestsChannel"
+        rep.CommonLibrary.Tool.RemoteManager.Funcs.DataPullFunc:InvokeServer(ohString1)
+    end
+end;
+})
+--
+Egg:AddDropdown({
+	Name = "Select the zone you want to tp to",
+	Default = "Select a zone...",
+	Options = eggs(),
+	Callback = function(arg)
+		_G.Egg = arg
+	end   
+})
+
+Egg:AddToggle({
+	Name = "Auto Buy Pets",
+	Default = false,
+	Callback = function(v)
+    _G.Farm = v
+    
+    if not _G.Farm then return end;
+
+    local plrs = hum
+
+    plrs.CFrame = wrk.Fight["FightArea_1_300"].Gamble[_G.Egg].CFrame * CFrame.new(5,5,0)
+    wait(0.5)
+    pcall(function()
+        while wait() do
+            if not _G.Farm then break end;
+            plrs.CFrame = wrk.Fight["FightArea_1_300"].Gamble[_G.Egg].CFrame * CFrame.new(5,5,0)
+            keypress(0x45)
+            keyrelease(0x45)
         end
-    end
-end 
-}
+    end)
+end;
+})
 
-Main:Toggle{
-	Name = "Auto Unlock Islands",
-	StartingState = false,
-	Description = nil,
+Teleport:AddButton({
+	Name = "Teleport GUI",
 	Callback = function()
-        getgenv().unlock = not getgenv().unlock
-        while (getgenv().unlock and wait()) do
-        local args = {[1] = {[1] = "UnlockMapStage_Request",[2] = 10}}
-        game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
-    end
-end
-}
+    myplaye = hum;
+    myplaye.CFrame = CFrame.new(0.00299099996, 316.210327, 57.6519775, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+end;
+})
 
--- // SLIDERS
-LocalPlayer:Slider{
+Teleport:AddButton({
+	Name = "Teleport To Inner Soul",
+	Callback = function()
+    myplaye = hum;
+    myplaye.CFrame = CFrame.new(59.6230011, 243.141983, 143.257965, -1, 0, 0, 0, 1, 0, 0, 0, -1)
+end;
+})
+
+LocalPlayer:AddSlider({
 	Name = "WalkSpeed",
-	Default = 16, -- // DEFAULT WALKSPEED YOU START WITH
-	Min = 16, -- // MIN WALKSPEED YOU CAN SET
-	Max = 500, -- // MAX WALKSPEED YOU CAN SET
-	Callback = function(s) -- // THE CALLBACK FUNCTION 
+	Min = 16,
+	Max = 500,
+	Default = 16,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "WalkSpeed",
+	Callback = function(s)
         local gmt = getrawmetatable(game)
         setreadonly(gmt, false)
         local oldindex = gmt.__index
@@ -163,14 +331,17 @@ LocalPlayer:Slider{
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
         setreadonly(gmt, true)
     end
-}
+})
 
-LocalPlayer:Slider{
-	Name = "JumpPower",
-	Default = 50, -- // DEFAULT JUMPPOWER YOU START WITH
-	Min = 50, -- // MIN JUMPPOWER YOU CAN SET
-	Max = 500, -- // MAX JUMPPOWER YOU CAN SET
-	Callback = function(j) -- // THE CALLBACK FUNCTION
+LocalPlayer:AddSlider({
+	Name = "Jump Power",
+	Min = 50,
+	Max = 500,
+	Default = 50,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "Jump Power",
+	Callback = function(j)
         local gmt = getrawmetatable(game)
         setreadonly(gmt, false)
         local oldindex = gmt.__index
@@ -183,80 +354,10 @@ LocalPlayer:Slider{
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = j
         setreadonly(gmt, true)
     end
-}
+})
 
-tele = {"Start_Map_1_Portal", "Start_Map_2_Portal", "Start_Map_3_Portal", "Start_Map_4_Portal",
-"Start_Map_5_Portal", "Start_Map_6_Portal", "Start_Map_7_Portal", "Start_Map_8_Portal",
-"Start_Map_9_Portal", "Start_Map_10_Portal"}
-for _,v in pairs(tele) do
-    if not table.find(tele,v.Name) then
-        table.insert(tele,v.Name)
-    end
-end
-
-_G.Tele = "False"
-local MyDropdown = Teleport:Dropdown{
-    Name = "Select what world you want to teleport...",
-    StartingText = "Select...",
-    Description = nil,
-    Items = tele,
-    Callback = function(arg)
-        _G.Tele = arg
-    end
-}
-
-Teleport:button{
-	Name = "Teleport To Selected World",
-	StartingState = false,
-	Description = nil,
-	Callback = function()
-    for _,v in pairs(game:GetService("Workspace").Map.Portals[_G.Tele]:GetDescendants()) do
-        if v:IsA("TouchTransmitter") then
-            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0)
-        wait()
-            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1)
-        end
-    end
-end
-}
-
-Teleport:button{
-	Name = "Teleport To Spawn",
-	StartingState = false,
-	Description = nil,
-	Callback = function()
-    local Cframe = game.Players.LocalPlayer.Character.HumanoidRootPart
-    Cframe.CFrame = CFrame.new(367.915863, 209.387207, 648.329773, 0.77303499, -0, -0.634363413, 0, 1, -0, 0.634363413, 0, 0.77303499)
-end
-}
-
--- // NOTIFICATIONS
-GUI:Notification{
-	Title = "Press Right Ctrl to hide the script", -- // THE NOTIFICATION TITLE
-	Text = "Please give me a thumbs up on script blox!", -- // THE NOTIFICATION TEXT
-	Duration = 7, -- // HOW LONG THE NOTIFICATION LASTS FOR
-	Callback = function() -- // THE CALLBACK FUNCTION
-        -- // CALLBACK FUNCTION (ANTI-AFK)
-        local vu = game:GetService("VirtualUser") -- // GETS YOUR LOCAL VIRTUALUSER
-        game:GetService("Players").LocalPlayer.Idled:connect(function() -- // FINDS AND GETS THE IDLED CONNECTIONS
-            vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame) -- // MOVES YOUR CAMERA DOWN
-                wait(1) -- // WAITS 1 SECOND
-            vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame) -- // MOVES YOUR CAMERA UP
-        end)
-    end
-}
-
--- // CREDITS 
-GUI:Credit{
-	Name = "Kaoru~",
-	Description = "Im working really hard on these scripts. Please support them!",
-	V3rm = nil,
-	Discord = "Kaoru~#0069"
-}
-
-Extra:Button{
+Discord:AddButton({
 	Name = "Join Our Discord Server",
-	Description = nil,
 	Callback = function()
         local Settings = {
             InviteCode = "zkvPrg89jD" --add your invite code here (without the "https://discord.gg/" part)
@@ -305,4 +406,67 @@ Extra:Button{
             spawn(DiscordInviteRequest)
         end
     end
-}
+})
+
+Extra:AddButton({
+	Name = "Make Rainbow CoreGui",
+	Callback = function()
+    local h,changecolors,seperatechangecolors = 0,{},{}
+    function add(a)
+        table.insert(changecolors,a)
+    end
+    function remove(a)
+        for i,v in pairs(changecolors) do
+            if v == a then 
+                table.remove(changecolors,i)
+            end
+        end
+    end
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.BottomButtonFrame.DescendantAdded:Connect(add)
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.BottomButtonFrame.DescendantRemoving:Connect(remove)
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.HubBar.DescendantAdded:Connect(add)
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.HubBar.DescendantRemoving:Connect(remove)
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.PageViewClipper.DescendantAdded:Connect(function(a)
+        table.insert(seperatechangecolors,a)
+    end)
+    game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.PageViewClipper.DescendantRemoving:Connect(function(a)
+        for i,v in pairs(seperatechangecolors) do
+            if v == a then
+                table.remove(seperatechangecolors,i)
+            end
+        end
+    end)
+    for i,v in pairs(game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.PageViewClipper:GetDescendants()) do
+        table.insert(seperatechangecolors,v)
+    end
+    for i,v in pairs(game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.HubBar:GetDescendants()) do
+        add(v)
+    end
+    for i,v in pairs(game:GetService("CoreGui").RobloxGui.SettingsShield.SettingsShield.MenuContainer.BottomButtonFrame:GetDescendants()) do
+        add(v)
+    end
+    game:GetService("RunService").RenderStepped:Connect(function()
+        h = h + 0.001
+        if h > 1 then
+            h = h - 1
+        end
+        for _,inst in pairs(seperatechangecolors) do
+            pcall(function() inst.TextColor3 = Color3.fromHSV(h,1,1) end)
+            pcall(function() inst.ImageColor3 = Color3.fromHSV(h,1,1) end)
+        end
+        for _,inst in pairs(changecolors) do
+            pcall(function() inst.TextColor3 = Color3.fromHSV(h,1,1) end)
+            pcall(function() inst.ImageColor3 = Color3.fromHSV(h,1,1) end)
+            pcall(function() inst.BackgroundColor3 = Color3.fromHSV(h,1,1) end)
+        end
+    end)
+end;
+})
+
+OrionLib:MakeNotification({
+    Name = "Urgent!",
+    Content = "If none of the modules load, please execute the script again.",
+    Time = 10
+})
+
+OrionLib:Init()
