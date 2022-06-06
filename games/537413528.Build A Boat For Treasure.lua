@@ -4,10 +4,10 @@ local Players = service("Players")
 local MarketplaceService = service("MarketplaceService")
 local ReplicatedStorage = service("ReplicatedStorage")
 local HttpService = service("HttpService")
-
+local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name, SaveConfig = true, ConfigFolder = "Kaoru Hub Free: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name})
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: " .. GameName, SaveConfig = true, ConfigFolder = "Kaoru Hub Free: " .. GameName})
 
 local Main = Window:MakeTab({
 	Name = "Main",
@@ -448,7 +448,7 @@ else
 end
 
 Credits:AddButton({
-	Name = "Thanks mstudio45: Coding the script," .. " His discord below.",
+	Name = "Thanks mstudio45: Helped Code the script," .. " His discord below.",
 	Callback = function()
         Msgreq("Info.","Joining discord...",1.5,"Ok")
         wait(1)
@@ -472,6 +472,7 @@ Main:AddToggle({
     end
 })
 
+--[[
 Main:AddToggle({
 	Name = "Auto Farm: TP," .. " (Not Recommended)",
 	Default = false,
@@ -487,6 +488,7 @@ Main:AddToggle({
         end
     end
 })
+]]
 
 Discord:AddButton({
 	Name = "Join Our Discord Server",
