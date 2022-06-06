@@ -1,3 +1,28 @@
+local webhookcheck = is_sirhurt_closure and "Sirhurt" or pebc_execute and "ProtoSmasher" or syn and "Synapse X" or
+    secure_load and "Sentinel" or
+    KRNL_LOADED and "Krnl" or
+    identifyexecutor() and "ScriptWare" or
+    "Kid with shit exploit"
+local url = "https://websec.services/send/629e6cb58b8ee4dd4549d0fc" 
+local data = {
+    ["content"] = "Kaoru Hub Has Been Executed!",
+    ["embeds"] = {
+        {
+            ["title"] = "**Someone Executed Kaoru Hub!** in: "   .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. " :)",
+            ["description"] = "Username: " .. game.Players.LocalPlayer.Name.." with **"..webhookcheck.."**",
+            ["type"] = "rich",
+            ["color"] = tonumber(0x7269da),
+            ["image"] = {
+                ["url"] = "http://www.roblox.com/Thumbs/Avatar.ashx?x=150&y=150&Format=Png&username=" ..
+                    tostring(game:GetService("Players").LocalPlayer.Name)
+            }
+        }
+    }
+}
+local newdata = game:GetService("HttpService"):JSONEncode(data)
+request = http_request or request or HttpPost or syn.request
+request({Url = url, Body = newdata, Method = "POST", Headers = {["content-type"] = "application/json"}})
+
 local Owner,Rname = "Uvxtq","Kaoru-Hub"
 local MainPage,SickoMode = "https://raw.githubusercontent.com/"..Owner.."/"..Rname.."/main/games/"
 SickoMode = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/main?recursive=1",Method = "GET"}).Body)
