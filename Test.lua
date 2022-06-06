@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 local startTick = tick();
 local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/zunzw/zynixdev/main/resources/sexyocto'))({cheatname = 'ReaperHub', gamename = 'universal'}); library:init()();
 local utility = library.utility;
@@ -9,7 +9,7 @@ local legitTab   = menu:AddTab('Legit')
 local visualTab  = menu:AddTab('Visuals')
 local miscTab    = menu:AddTab('Misc')
 local settingTab = library:CreateSettingsTab(menu)
-=======
+
 print("Report any bugs errors you see to the discord")
 local function service(...) return game:GetService(...) end
 
