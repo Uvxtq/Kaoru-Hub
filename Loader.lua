@@ -5,7 +5,7 @@ local webhookcheck =
     secure_load and "Sentinel" or
     KRNL_LOADED and "Krnl" or
     identifyexecutor() and "ScriptWare" or
-    "Kid with shit exploit"                                 
+    "Kid with shit exploit"
     if webhookcheck == "Kid with shit exploit" then
         game.Players.LocalPlayer:Kick("Your executer is not supported, try using: Synapse X; Sentinel; Krnl; or ScriptWare.")
     end
