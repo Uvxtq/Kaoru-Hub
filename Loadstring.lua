@@ -13,7 +13,8 @@ $$ | \$$\$$$$$$$ |\$$$$$$  |$$ |      \$$$$$$  |      $$ |  $$ |\$$$$$$  |$$$$$$
     Developers: Kaoru~##0069, mstudio45#5590, aaaa (jebać putina skurwysyna)#9683, and Reddy#3518.
     Version: 1.0.0
     Repository: https://github.com/Uvxtq/Kaoru-Hub
+    Discord: https://discord.gg/zkvPrg89jD
 
 --]]
-
+_G.Key = "KaoruIsHot"
 loadstring(game:HttpGet(('https://raw.githubusercontent.com/Uvxtq/Kaoru-Hub/main/Loader.lua'),true))()
