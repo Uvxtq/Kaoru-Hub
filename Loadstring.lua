@@ -16,5 +16,5 @@ $$ | \$$\$$$$$$$ |\$$$$$$  |$$ |      \$$$$$$  |      $$ |  $$ |\$$$$$$  |$$$$$$
     Discord: https://discord.gg/zkvPrg89jD
 
 --]]
-_G.Key = "KaoruIsHot"
+
 loadstring(game:HttpGet(('https://raw.githubusercontent.com/Uvxtq/Kaoru-Hub/main/Loader.lua'),true))()
