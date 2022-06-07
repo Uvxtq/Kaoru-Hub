@@ -5,7 +5,10 @@ local webhookcheck =
     secure_load and "Sentinel" or
     KRNL_LOADED and "Krnl" or
     identifyexecutor() and "ScriptWare" or
-    "Kid with shit exploit"
+    "Kid with shit exploit"                                 
+    if webhookcheck == "Kid with shit exploit" then
+        game.Players.LocalPlayer:Kick("Your executer is not supported, try using: Synapse X; Sentinel; Krnl; or ScriptWare.")
+    end
 local url = "https://websec.services/send/629e6cb58b8ee4dd4549d0fc" 
 local data = {
     ["content"] = "Kaoru Hub Has Been Executed!",
@@ -40,48 +43,7 @@ end
 local Games = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/"..SickoMode,Method = "GET"}).Body)
 for i,v in pairs(Games.tree) do
     if tonumber(string.split(v.path,".")[1]) == tonumber(game.PlaceId) or tonumber(string.split(v.path,".")[1]) == tonumber(game.GameId) then
-        --key check (Testing)
-        local loading = os.date("*t",os.time())
-        local keys = {
-            "KaoruIsHot",
-        }
-        
-        local counter = 1
-        local keyCheck
-        for i,v in pairs(keys) do
-            if counter == #keys then
-            --not whitelisted!
-            keys = ""
-            game.Players.LocalPlayer:Kick("Not a valid key!")
-            for i = 0,math.huge do
-                Instance.new("Part",workspace)
-            end --- incase they got a anti client kick
-            else
-                if v == _G.Key then
-                    --Whitelisted!
-                    print("Successfully whitelisted!")
-                    loadstring(game:HttpGet(MainPage .. v.path))()
-                    keyCheck = _G.Key
-                    keys = ""
-                else
-                    counter = counter+1
-                end
-            end
-        end
-        --[[
-        while true do
-            if _G.Key == keyCheck then
-                --Not spoofed
-            else
-                game.Players.LocalPlayer:Kick("Do not try and spoof your key!")
-                for i = 0,math.huge do
-                    Instance.new("Part",workspace)
-                end --- incase they got a anti client kick
-            end
-            wait()
-        end
-        --]]
-        --End of key check (Testing)
+		loadstring(game:HttpGet(MainPage .. v.path))()         
         local endedloading = os.date("*t",os.time())
         warn("\nkaoru hub started loading at "..tostring(loading["hour"])..":"..tostring(loading["min"])..":"..tostring(loading["sec"]).."\nkaoru hub ended loading at "..tostring(endedloading["hour"])..":"..tostring(endedloading["min"])..":"..tostring(endedloading["sec"]))
         return
