@@ -68,6 +68,7 @@ for i,v in pairs(Games.tree) do
                 end
             end
         end
+        --[[
         while true do
             if _G.Key == keyCheck then
                 --Not spoofed
@@ -79,6 +80,7 @@ for i,v in pairs(Games.tree) do
             end
             wait()
         end
+        --]]
         --End of key check (Testing)
         local endedloading = os.date("*t",os.time())
         warn("\nkaoru hub started loading at "..tostring(loading["hour"])..":"..tostring(loading["min"])..":"..tostring(loading["sec"]).."\nkaoru hub ended loading at "..tostring(endedloading["hour"])..":"..tostring(endedloading["min"])..":"..tostring(endedloading["sec"]))
