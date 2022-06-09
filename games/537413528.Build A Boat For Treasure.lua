@@ -1,37 +1,60 @@
 local function service(...) return game:GetService(...) end
 
-local Players = service("Players")
-local MarketplaceService = service("MarketplaceService")
-local ReplicatedStorage = service("ReplicatedStorage")
-local HttpService = service("HttpService")
-local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+local Services = {
+	[1] = service("Players");
+	[2] = service("Character");
+	[3] = service("Humanoid");
+	[4] = service("JumpPower");
+	[5] = service("WalkSpeed");
+	[6] = service("MarketplaceService");
+	[7] = service("ReplicatedStorage");
+	[8] = service("HttpService");
+	[9] = service("VirtualUser");
+	[10] = service("StarterGui");
+	[11] = service("RunService");
+	[12] = service("TweenService");
+}
+
+pcall(function()
+	for i,v in pairs(getconnections(Services[1].Idled)) do
+		v:Disable()
+	end
+end)
+
+local GameName = Services[6]:GetProductInfo(game.PlaceId).Name
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: " .. GameName})
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub: " .. GameName})
 
 local Main = Window:MakeTab({
 	Name = "Main",
 	Icon = "rbxassetid://8945416692",
-	PremiumOnly = false
 })
 
 local LocalPlayer = Window:MakeTab({
 	Name = "LocalPlayer",
 	Icon = "rbxassetid://8945470040",
-	PremiumOnly = false
 })
 
 local Credits = Window:MakeTab({
 	Name = "Credits",
 	Icon = "rbxassetid://8950218710",
-	PremiumOnly = false
 })
 
 local Discord = Window:MakeTab({
 	Name = "Discord",
 	Icon = "rbxassetid://8950218710",
-	PremiumOnly = false
 })
+
+local function HttpsError()
+	Services[10]:SetCore("SendNotification", {
+		Title = "Error!",
+		Text = "Your executer does not support HTTPS. Please download Krnl (Free), Script-Ware (Paid; 20$), or SynapseX (Paid, 20$).",
+		Duration = 10,
+		Callback = nil,
+		Button1 = "Okay.",
+	})
+end
 
 LocalPlayer:AddSlider({
 	Name = "WalkSpeed",
@@ -51,7 +74,7 @@ LocalPlayer:AddSlider({
             end
             return oldindex(self,s)
         end)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
         setreadonly(gmt, true)
     end
 })
@@ -85,7 +108,6 @@ local function CedDiscord()
     }
     
     -- Objects
-    local HttpService = game:GetService("HttpService")
     local RequestFunction
     
     if syn and syn.request then
@@ -102,7 +124,7 @@ local function CedDiscord()
     
     -- Start
     if not RequestFunction then
-        return print("Your executor does not support http requests.")
+        return HttpsError()
     end
     
     for i = 6453, 6464 do
@@ -110,8 +132,8 @@ local function CedDiscord()
             local Request = RequestFunction({
                 Url = string.format(DiscordApiUrl, tostring(i)),
                 Method = "POST",
-                Body = HttpService:JSONEncode({
-                    nonce = HttpService:GenerateGUID(false),
+                Body = Services[8]:JSONEncode({
+                    nonce = Services[8]:GenerateGUID(false),
                     args = {
                         invite = {code = Settings.InviteCode},
                         code = Settings.InviteCode
@@ -134,7 +156,6 @@ local function discordMain()
     }
     
     -- Objects
-    local HttpService = game:GetService("HttpService")
     local RequestFunction
     
     if syn and syn.request then
@@ -151,7 +172,7 @@ local function discordMain()
     
     -- Start
     if not RequestFunction then
-        return print("Your executor does not support http requests.")
+        return HttpsError()
     end
     
     for i = 6453, 6464 do
@@ -159,8 +180,8 @@ local function discordMain()
             local Request = RequestFunction({
                 Url = string.format(DiscordApiUrl, tostring(i)),
                 Method = "POST",
-                Body = HttpService:JSONEncode({
-                    nonce = HttpService:GenerateGUID(false),
+                Body = Services[8]:JSONEncode({
+                    nonce = Services[8]:GenerateGUID(false),
                     args = {
                         invite = {code = Settings.InviteCode},
                         code = Settings.InviteCode
@@ -225,13 +246,6 @@ spawn(function()
 			repeat wait() until	farmonv2 == true and farmon == false and running == false
 		end
 		if farmonv2 == true and farmon == false then
-			local vu2 = game:GetService("VirtualUser")
-			game:GetService("Players").LocalPlayer.Idled:connect(function()
-				vu2:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-				wait(1)
-				vu2:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			end)
-
 			while wait() do
 				if farmon == true and running == true and farmonv2 == true then
 					repeat wait() until	farmonv2 == true and farmon == false and running == false
@@ -239,11 +253,11 @@ spawn(function()
 				if farmonv2 == true and farmon == false then  
 					running2 = true
 					spawn(function()
-						game:getService("RunService"):BindToRenderStep("NoClip",0,function()
+						Services[11]:BindToRenderStep("NoClip",0,function()
 							pcall(function()
-								if not game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid") then return end
+								if not Services[2]:findFirstChildOfClass("Humanoid") then return end
 								if not running2 == true then return end
-								game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid"):ChangeState(11)
+								Services[2]:findFirstChildOfClass("Humanoid"):ChangeState(11)
 							end)
 						end)
 					end)
@@ -274,25 +288,22 @@ spawn(function()
 						end
 					end
 
-					local character = game.Players.LocalPlayer.Character 
-					local hrp = character:WaitForChild("HumanoidRootPart")
-
-                    repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    repeat wait() until Services[2]:FindFirstChild("HumanoidRootPart")
 
 					local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
-					local Animation = game:GetService("TweenService"):Create(game:GetService("Players")["LocalPlayer"].Character.HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(parttotweenfirst.Position)})
+					local Animation = Services[12]:Create(Services[2].HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(parttotweenfirst.Position)})
 					Animation:Play()
 					repeat wait() until Animation.Completed:Wait()
 					wait()
 
 					local tweenInfo2 = TweenInfo.new(15, Enum.EasingStyle.Linear)
-					local Animation2 = game:GetService("TweenService"):Create(game:GetService("Players")["LocalPlayer"].Character.HumanoidRootPart, tweenInfo2, {CFrame = CFrame.new(parttotween.Position)})
+					local Animation2 = Services[12]:Create(Services[2].HumanoidRootPart, tweenInfo2, {CFrame = CFrame.new(parttotween.Position)})
 					Animation2:Play()
 					repeat wait() until Animation2.Completed:Wait()
 					wait()
 
-					repeat wait() until game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
+					repeat wait() until Services[2]:WaitForChild("HumanoidRootPart")
+					Services[2].HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
 					local waitingtpchest = 0
 					spawn(function()
 						for i=12,0,-1 do
@@ -301,10 +312,10 @@ spawn(function()
 						end
 					end)
 					repeat
-						if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-							game.Players.LocalPlayer.Character.Humanoid.Jump = true
-							wait()
-							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
+						if Services[2]:FindFirstChild("Humanoid") and Services[2]:FindFirstChild("HumanoidRootPart") then
+							Services[2].Humanoid.Jump = true
+						wait()
+							Services[2].HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
 						end
 						wait()
 					until waitingtpchest == 13
@@ -321,6 +332,7 @@ spawn(function()
 	end
 end)
 
+--[[
 spawn(function()
 	while wait() do
 		if farmonv2 == true and running2 == true and farmon == true then
@@ -387,7 +399,6 @@ spawn(function()
 	end
 end)
 
---[[
 Main:AddButton({
 	Name = "Delete Anti-Cheat.",
 	Callback = function(v)
@@ -401,7 +412,7 @@ Main:AddButton({
         end
     end
 })
-]]
+--]]
 
 Main:AddButton({
 	Name = "Delete Parts.",
@@ -462,12 +473,12 @@ Main:AddToggle({
 	Callback = function(bool)
         farmonv2 = bool
         if bool == true then
-            Msgreq("Info.","Auto Farm (Tween) Toggled On!",3,"Ok")
+            Msgreq("Info.","Auto Farm [Toggled On!]",3,"Ok")
         end
         if bool == false then
             repeat wait() until running2 == false
             wait(0.25)
-            Msgreq("Info.","Auto Farm (Tween) Toggled Off!",3,"Ok")
+            Msgreq("Info.","Auto Farm [Toggled Off!]",3,"Ok")
         end
     end
 })
