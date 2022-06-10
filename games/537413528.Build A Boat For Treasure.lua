@@ -390,7 +390,7 @@ local function Synapse()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using Synapse!, this is the best executer to use this script with..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
@@ -398,7 +398,7 @@ local function Sentinel()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using Sentinel!, this is a a supported executer..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
@@ -406,7 +406,7 @@ local function Krnl()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using Krnl!, this is a a supported executer..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
@@ -414,7 +414,7 @@ local function ScriptWare()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using ScriptWare!, this is a a supported executer..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
@@ -422,7 +422,7 @@ local function Sirhurt()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using Sirhurt!, this is a a supported executer..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
@@ -430,16 +430,17 @@ local function ProtoSmasher()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using ProtoSmasher!, this is a a supported executer..., have fun!",
-        Time = 7
+        Time = 10
     })
 end
 
 local function PUSE()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using ProtoSmasher!, this is a a supported executer..., have fun!",
-        Time = 7
+        Content = "You are using a unsupported executer, that could mean you cant join the discord, so we've copied it to your clipboard..., have fun!",
+        Time = 10
     })
+	setclipboard("https://discord.gg/zkvPrg89jD")
 end
 
 pcall(function()
