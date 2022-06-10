@@ -1,27 +1,26 @@
 local function service(...) return game:GetService(...) end
 
-local Services = {
-	[1] = service("Players");
-	[2] = service("Character");
-	[3] = service("Humanoid");
-	[4] = service("JumpPower");
-	[5] = service("WalkSpeed");
-	[6] = service("MarketplaceService");
-	[7] = service("ReplicatedStorage");
-	[8] = service("HttpService");
-	[9] = service("VirtualUser");
-	[10] = service("StarterGui");
-	[11] = service("RunService");
-	[12] = service("TweenService");
-}
+--[[Services]]--
+local Players = service("Players")
+local LocalPlayer = Players["LocalPlayer"]
+local Character = game.Players.LocalPlayer.Character
+local Humanoid = game.Players.LocalPlayer.Character.Humanoid
+local JumpPower = service("JumpPower")
+local WalkSpeed = service("WalkSpeed")
+local MarketplaceService = service("MarketplaceService")
+local ReplicatedStorage = service("ReplicatedStorage")
+local HttpService = service("HttpService")
+local VirtualUser = service("VirtualUser")
+local RunService = service("RunService")
+local TweenService = service("TweenService")
+local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 pcall(function()
-	for i,v in pairs(getconnections(Services[1].Idled)) do
+	for i,v in pairs(getconnections(Players.Idled)) do
 		v:Disable()
 	end
 end)
 
-local GameName = Services[6]:GetProductInfo(game.PlaceId).Name
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
 local Window = OrionLib:MakeWindow({Name = "Kaoru Hub: " .. GameName})
@@ -132,8 +131,8 @@ local function CedDiscord()
             local Request = RequestFunction({
                 Url = string.format(DiscordApiUrl, tostring(i)),
                 Method = "POST",
-                Body = Services[8]:JSONEncode({
-                    nonce = Services[8]:GenerateGUID(false),
+                Body = HttpService:JSONEncode({
+                    nonce = HttpService:GenerateGUID(false),
                     args = {
                         invite = {code = Settings.InviteCode},
                         code = Settings.InviteCode
@@ -180,8 +179,8 @@ local function discordMain()
             local Request = RequestFunction({
                 Url = string.format(DiscordApiUrl, tostring(i)),
                 Method = "POST",
-                Body = Services[8]:JSONEncode({
-                    nonce = Services[8]:GenerateGUID(false),
+                Body = HttpService:JSONEncode({
+                    nonce = HttpService:GenerateGUID(false),
                     args = {
                         invite = {code = Settings.InviteCode},
                         code = Settings.InviteCode
@@ -243,21 +242,33 @@ end
 spawn(function()
 	while wait() do
 		if farmon == true and running == true and farmonv2 == true then
+			Msgreq("Info.","Confirming checks...",2,"Ok")
 			repeat wait() until	farmonv2 == true and farmon == false and running == false
 		end
 		if farmonv2 == true and farmon == false then
+			local vu2 = game:GetService("VirtualUser")
+			game:GetService("Players").LocalPlayer.Idled:connect(function()
+				vu2:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+				wait(1)
+				vu2:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+			end)
+
 			while wait() do
 				if farmon == true and running == true and farmonv2 == true then
+					Msgreq("Info.","Confirming checks",2,"Ok")
 					repeat wait() until	farmonv2 == true and farmon == false and running == false
 				end
 				if farmonv2 == true and farmon == false then  
+					if autofarmv2ShowLogs then
+						Logs:Show()
+					end
 					running2 = true
 					spawn(function()
-						Services[11]:BindToRenderStep("NoClip",0,function()
+						game:getService("RunService"):BindToRenderStep("NoClip",0,function()
 							pcall(function()
-								if not Services[2]:findFirstChildOfClass("Humanoid") then return end
+								if not game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid") then return end
 								if not running2 == true then return end
-								Services[2]:findFirstChildOfClass("Humanoid"):ChangeState(11)
+								game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid"):ChangeState(11)
 							end)
 						end)
 					end)
@@ -287,23 +298,25 @@ spawn(function()
 							end)
 						end
 					end
+					local character = game.Players.LocalPlayer.Character 
+					local hrp = character:WaitForChild("HumanoidRootPart")
 
-                    repeat wait() until Services[2]:FindFirstChild("HumanoidRootPart")
+					Msgreq("Info.","Tweening to end",5,"Ok")
 
 					local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
-					local Animation = Services[12]:Create(Services[2].HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(parttotweenfirst.Position)})
+					local Animation = game:GetService("TweenService"):Create(game:GetService("Players")["LocalPlayer"].Character.HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(parttotweenfirst.Position)})
 					Animation:Play()
 					repeat wait() until Animation.Completed:Wait()
 					wait()
 
 					local tweenInfo2 = TweenInfo.new(15, Enum.EasingStyle.Linear)
-					local Animation2 = Services[12]:Create(Services[2].HumanoidRootPart, tweenInfo2, {CFrame = CFrame.new(parttotween.Position)})
+					local Animation2 = game:GetService("TweenService"):Create(game:GetService("Players")["LocalPlayer"].Character.HumanoidRootPart, tweenInfo2, {CFrame = CFrame.new(parttotween.Position)})
 					Animation2:Play()
 					repeat wait() until Animation2.Completed:Wait()
 					wait()
 
-					repeat wait() until Services[2]:WaitForChild("HumanoidRootPart")
-					Services[2].HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
+					repeat wait() until game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
 					local waitingtpchest = 0
 					spawn(function()
 						for i=12,0,-1 do
@@ -311,15 +324,18 @@ spawn(function()
 							wait(1)
 						end
 					end)
+					Msgreq("Info.","Trying to claim chest...",5,"Ok")
 					repeat
-						if Services[2]:FindFirstChild("Humanoid") and Services[2]:FindFirstChild("HumanoidRootPart") then
-							Services[2].Humanoid.Jump = true
-						wait()
-							Services[2].HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
+						if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+							game.Players.LocalPlayer.Character.Humanoid.Jump = true
+							wait()
+							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
 						end
 						wait()
 					until waitingtpchest == 13
+					Msgreq("Info.","Chest claimed.",2.75,"Ok")
 					wait(2.75)
+					Msgreq("Info.","Claiming Rewards...",3,"Ok")
 					running2 = false
 					waitingtpchest = 0
 					wait()
@@ -331,88 +347,6 @@ spawn(function()
 		end
 	end
 end)
-
---[[
-spawn(function()
-	while wait() do
-		if farmonv2 == true and running2 == true and farmon == true then
-			repeat wait() until	farmonv2 == false and farmon == true and running2 == false
-		end
-		if farmon == true and farmonv2 == false then
-			local vu = game:GetService("VirtualUser")
-			game:GetService("Players").LocalPlayer.Idled:connect(function()
-				vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-				wait(1)
-				vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			end)
-
-			while wait() do
-				if farmonv2 == true and running2 == true and farmon == true then
-					repeat wait() until	farmonv2 == false and farmon == true and running2 == false
-				end
-				if farmon == true and farmonv2 == false then 			
-					running = true
-					spawn(function()
-						game:getService("RunService"):BindToRenderStep("NoClip",0,function()
-							pcall(function()
-								if not game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid") then return end
-								if not running == true then return end
-								game.Players.LocalPlayer.Character:findFirstChildOfClass("Humanoid"):ChangeState(11)
-							end)
-						end)
-					end)
-
-					local checks = workspace.BoatStages:GetDescendants()
-					for i=1,#checks do
-						running = true
-						if checks[i].Name == "DarknessPart" or checks[i].Name == "GatePart" then
-							checks[i].Transparency = 0
-							if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-								game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = checks[i].CFrame
-								local float = Instance.new("Part",game.Workspace)
-								float.Name = "zhwzuehwugewfzewzgefwzfewewew"
-								float.Anchored = true
-								float.Size = Vector3.new(9999,1,9999)
-								float.CFrame = CFrame.new(checks[i].Position.X, 60, checks[i].Position.Z)
-							end
-							wait(0.24)
-							pcall(function()game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = checks[i].CFrame;end)
-						end
-					end
-					repeat wait() until game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
-					repeat
-						if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-							game.Players.LocalPlayer.Character.Humanoid.Jump = true
-							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger.CFrame
-						end
-						wait()
-					until not game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-					running = false
-					wait()
-					deleteParts(true)
-				else
-					wait()
-				end
-			end	
-		end
-	end
-end)
-
-Main:AddButton({
-	Name = "Delete Anti-Cheat.",
-	Callback = function(v)
-        _G.ExploitCheckRemote = v
-        if _G.ExploitCheckRemote == true then
-            game:GetService("Workspace").ExploitCheckRemote:Destroy()
-            wait(1)
-            Msgreq("Info.","Anti-Cheat Disabled",2,"Nice!")
-        else
-            Msgreq("Info.","Anti-Cheat Already Disabled Silly!",2,"Ok, Faggot >:(")
-        end
-    end
-})
---]]
 
 Main:AddButton({
 	Name = "Delete Parts.",
@@ -443,6 +377,89 @@ function deleteParts(noLogs)
 	end
 end
 
+local Executer_Check = 
+is_sirhurt_closure and "Sirhurt" or 
+pebc_execute and "ProtoSmasher" or 
+syn and "Synapse X" or 
+secure_load and "Sentinel" or
+KRNL_LOADED and "Krnl" or
+identifyexecutor() and "ScriptWare" or
+"Possible unsupported executer"
+
+local function Synapse()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using Synapse!, this is the best executer to use this script with..., have fun!",
+        Time = 7
+    })
+end
+
+local function Sentinel()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using Sentinel!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+local function Krnl()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using Krnl!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+local function ScriptWare()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using ScriptWare!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+local function Sirhurt()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using Sirhurt!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+local function ProtoSmasher()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using ProtoSmasher!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+local function PUSE()
+	OrionLib:MakeNotification({
+        Name = "Hello!",
+        Content = "You are using ProtoSmasher!, this is a a supported executer..., have fun!",
+        Time = 7
+    })
+end
+
+pcall(function()
+	if syn and "Synapse X" then
+		Synapse()
+	elseif secure_load and "Sentinel" then
+		Sentinel()
+	elseif KRNL_LOADED and "Krnl" then
+		Krnl()
+	elseif identifyexecutor() and "ScriptWare" then
+		ScriptWare()
+	elseif is_sirhurt_closure and "Sirhurt" then
+		Sirhurt()
+	elseif pebc_execute and "ProtoSmasher" then
+		ProtoSmasher()
+	elseif Executer_Check == "Possible unsupported executer" then
+		PUSE()
+	end
+end)
+
 if game.CoreGui:FindFirstChild("ScriptYes") then
 	OrionLib:MakeNotification({
         Name = "Success!",
@@ -468,7 +485,7 @@ Credits:AddButton({
 })
 
 Main:AddToggle({
-	Name = "Auto Farm: Tween," .. " (Recommended)",
+	Name = "Auto Farm",
 	Default = false,
 	Callback = function(bool)
         farmonv2 = bool
@@ -482,24 +499,6 @@ Main:AddToggle({
         end
     end
 })
-
---[[
-Main:AddToggle({
-	Name = "Auto Farm: TP," .. " (Not Recommended)",
-	Default = false,
-	Callback = function(bool)
-        farmon = bool
-        if bool == true then
-            Msgreq("Info.","Auto Farm (TP) Toggled On!",3,"Ok")
-        end
-        if bool == false then
-            repeat wait() until running2 == false
-            wait(0.25)
-            Msgreq("Info.","Auto Farm (TP) Toggled Off!",3,"Ok")
-        end
-    end
-})
-]]
 
 Discord:AddButton({
 	Name = "Join Our Discord Server",
