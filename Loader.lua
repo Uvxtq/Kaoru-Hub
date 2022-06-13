@@ -44,8 +44,6 @@ local Games = game:GetService("HttpService"):JSONDecode(request({Url = "https://
 for i,v in pairs(Games.tree) do
     if tonumber(string.split(v.path,".")[1]) == tonumber(game.PlaceId) or tonumber(string.split(v.path,".")[1]) == tonumber(game.GameId) then
 		loadstring(game:HttpGet(MainPage..v.path))()        
-        local endedloading = os.date("*t",os.time())
-        warn("\nkaoru hub started loading at "..tostring(loading["hour"])..":"..tostring(loading["min"])..":"..tostring(loading["sec"]).."\nkaoru hub ended loading at "..tostring(endedloading["hour"])..":"..tostring(endedloading["min"])..":"..tostring(endedloading["sec"]))
         return
     end
 end
