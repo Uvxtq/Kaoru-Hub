@@ -1,3 +1,4 @@
+
 local webhookcheck = 
     is_sirhurt_closure and "Sirhurt" or 
     pebc_execute and "ProtoSmasher" or 
@@ -18,16 +19,15 @@ local data = {
             ["description"] = "Username: " .. game.Players.LocalPlayer.Name.." with **"..webhookcheck.."**",
             ["type"] = "rich",
             ["color"] = tonumber(0x7269da),
-            --[[
             ["image"] = {
                 ["url"] = "http://www.roblox.com/Thumbs/Avatar.ashx?x=150&y=150&Format=Png&username="..tostring(game:GetService("Players").LocalPlayer.Name)
             }
-            --]]
         }
     }
 }
+
 local newdata = game:GetService("HttpService"):JSONEncode(data)
-request = http_request or request or HttpPost or syn.request
+request = http_request or request or HttpPost or syn.request or http.request
 request({Url = url, Body = newdata, Method = "POST", Headers = {["content-type"] = "application/json"}})
 
 local Owner,Rname = "Uvxtq","Kaoru-Hub"
@@ -35,7 +35,7 @@ local MainPage,SickoMode = "https://raw.githubusercontent.com/"..Owner.."/"..Rna
 SickoMode = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/main?recursive=1",Method = "GET"}).Body)
 for i,v in pairs(SickoMode.tree) do
     if v.path == "games" then
-        SickoMode = v.sha
+            SickoMode = v.sha
         break
     end
 end
@@ -43,7 +43,7 @@ end
 local Games = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/"..SickoMode,Method = "GET"}).Body)
 for i,v in pairs(Games.tree) do
     if tonumber(string.split(v.path,".")[1]) == tonumber(game.PlaceId) or tonumber(string.split(v.path,".")[1]) == tonumber(game.GameId) then
-		loadstring(game:HttpGet(MainPage .. v.path))()         
+		loadstring(game:HttpGet(MainPage..v.path))()         
         local endedloading = os.date("*t",os.time())
         warn("\nkaoru hub started loading at "..tostring(loading["hour"])..":"..tostring(loading["min"])..":"..tostring(loading["sec"]).."\nkaoru hub ended loading at "..tostring(endedloading["hour"])..":"..tostring(endedloading["min"])..":"..tostring(endedloading["sec"]))
         return
