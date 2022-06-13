@@ -1,6 +1,6 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: Weapon Fighting Simulator", SaveConfig = true, ConfigFolder = "Kaoru Hub Free: Weapon Fighting Simulator"})
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Free: Weapon Fighting Simulator"})
 
 local Main = Window:MakeTab({
 	Name = "Main",

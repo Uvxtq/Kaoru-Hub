@@ -4,7 +4,7 @@ local function service(...) return game:GetService(...) end
 
 local MarketplaceService = service("MarketplaceService")
 
-local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Universal: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name, SaveConfig = true, ConfigFolder = "Kaoru Hub Universal: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name})
+local Window = OrionLib:MakeWindow({Name = "Kaoru Hub Universal: " .. MarketplaceService:GetProductInfo(game.PlaceId).Name})
 
 local Camera = workspace.CurrentCamera
 local Players = game:GetService("Players")
