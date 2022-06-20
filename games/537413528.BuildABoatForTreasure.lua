@@ -49,10 +49,19 @@ local function HttpsError()
 	game:GetService("StarterGui"):SetCore("SendNotification", {
 		Title = "Error!",
 		Text = "Your executer does not support HTTPS. Please download Krnl (Free), Script-Ware (Paid; 20$), or SynapseX (Paid, 20$).",
-		Duration = 10,
+		Duration = 3,
 		Callback = nil,
 		Button1 = "Okay.",
 	})
+	wait(3)
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Fixing...",
+		Text = "Since executer does not support HTTPS. We've copied the discord invite to your clipboard.",
+		Duration = 2.5,
+		Callback = nil,
+		Button1 = "Okay.",
+	})
+	setclipboard("https://discord.gg/zkvPrg89jD")
 end
 
 LocalPlayer:AddSlider({
@@ -370,47 +379,47 @@ local function Synapse()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using Synapse!, this is the best executer to use this script with..., have fun!",
-        Time = 10
+        Time = 6
     })
 end
 
 local function Sentinel()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using Sentinel!, this is a a supported executer..., have fun!",
-        Time = 10
+        Content = "You are using Sentinel!, this is a supported executer..., have fun!",
+        Time = 6
     })
 end
 
 local function Krnl()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using Krnl!, this is a a supported executer..., have fun!",
-        Time = 10
+        Content = "You are using Krnl!, this is a supported executer..., have fun!",
+        Time = 6
     })
 end
 
 local function ScriptWare()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using ScriptWare!, this is a a supported executer..., have fun!",
-        Time = 10
+        Content = "You are using ScriptWare!, this is a supported executer..., have fun!",
+        Time = 6
     })
 end
 
 local function Sirhurt()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using Sirhurt!, this is a a supported executer..., have fun!",
-        Time = 10
+        Content = "You are using Sirhurt!, this is a supported executer..., have fun!",
+        Time = 6
     })
 end
 
 local function ProtoSmasher()
 	OrionLib:MakeNotification({
         Name = "Hello!",
-        Content = "You are using ProtoSmasher!, this is a a supported executer..., have fun!",
-        Time = 10
+        Content = "You are using ProtoSmasher!, this is a supported executer..., have fun!",
+        Time = 6
     })
 end
 
@@ -418,7 +427,7 @@ local function PUSE()
 	OrionLib:MakeNotification({
         Name = "Hello!",
         Content = "You are using a unsupported executer, that could mean you cant join the discord, so we've copied it to your clipboard..., have fun!",
-        Time = 10
+        Time = 6
     })
 	setclipboard("https://discord.gg/zkvPrg89jD")
 end
