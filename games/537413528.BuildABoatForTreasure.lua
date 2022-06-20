@@ -46,7 +46,7 @@ local Discord = Window:MakeTab({
 })
 
 local function HttpsError()
-	Services[10]:SetCore("SendNotification", {
+	game:GetService("StarterGui"):SetCore("SendNotification", {
 		Title = "Error!",
 		Text = "Your executer does not support HTTPS. Please download Krnl (Free), Script-Ware (Paid; 20$), or SynapseX (Paid, 20$).",
 		Duration = 10,
@@ -64,17 +64,7 @@ LocalPlayer:AddSlider({
 	Increment = 1,
 	ValueName = "WalkSpeed",
 	Callback = function(s)
-        local gmt = getrawmetatable(game)
-        setreadonly(gmt, false)
-        local oldindex = gmt.__index
-        gmt.__index = newcclosure(function(self,s)
-            if s == "WalkSpeed" then
-                return 16
-            end
-            return oldindex(self,s)
-        end)
 		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
-        setreadonly(gmt, true)
     end
 })
 
@@ -87,17 +77,7 @@ LocalPlayer:AddSlider({
 	Increment = 1,
 	ValueName = "Jump Power",
 	Callback = function(j)
-        local gmt = getrawmetatable(game)
-        setreadonly(gmt, false)
-        local oldindex = gmt.__index
-        gmt.__index = newcclosure(function(self,j)
-            if j == "JumpPower" then
-                return 50
-            end
-            return oldindex(self,j)
-        end)
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = j
-        setreadonly(gmt, true)
     end
 })
 
