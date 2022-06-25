@@ -30,26 +30,8 @@ local newdata = game:GetService("HttpService"):JSONEncode(data)
 request = http_request or request or HttpPost or syn.request or http.request
 request({Url = url, Body = newdata, Method = "POST", Headers = {["content-type"] = "application/json"}})
 
-local Owner,Rname = "Uvxtq","Kaoru-Hub"
-local MainPage,SickoMode = "https://raw.githubusercontent.com/"..Owner.."/"..Rname.."/main/games/"
-SickoMode = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/main?recursive=1",Method = "GET"}).Body)
-for i,v in pairs(SickoMode.tree) do
-    if v.path == "games" then
-        SickoMode = v.sha
-        break
-    end
-end
-
-local Games = game:GetService("HttpService"):JSONDecode(request({Url = "https://api.github.com/repos/"..Owner.."/"..Rname.."/git/trees/"..SickoMode,Method = "GET"}).Body)
-for i,v in pairs(Games.tree) do
-    if tonumber(string.split(v.path,".")[1]) == tonumber(game.PlaceId) or tonumber(string.split(v.path,".")[1]) == tonumber(game.GameId) then
-		loadstring(game:HttpGet(MainPage..v.path))()        
-        return
-    end
-end
-
 local dummy = Instance.new("BindableFunction")
-function bindable.OnInvoke(response)
+function dummy.OnInvoke(response)
     if response == "Okay!" then
         setclipboard('https://discord.gg/zkvPrg89jD')
     end
@@ -113,12 +95,22 @@ function bindable.OnInvoke(response)
     end
 end
 
--- // Send the notification 
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Hi, This game is not supported!",
-    Text = "Wanna Join My Discord?",
-    Duration = 7,
-    Callback = bindable,
-    Button1 = "Okay!",
-    Button2 = "No"
-})
+local Link = "https://raw.githubusercontent.com/Uvxtq/Kaoru-Hub/main/games/"
+if game.PlaceId or game.GameId == "537413528" then
+    loadstring(game:HttpGet((Link.."537413528.BuildABoatForTreasure.lua"),true))()
+elseif game.PlaceId or game.GameId == "4483381587" then
+    loadstring(game:HttpGet((Link.."4483381587.WeaponFightingSimulator.lua"),true))()
+elseif game.PlaceId or game.GameId == "8739926633" then
+    loadstring(game:HttpGet((Link.."8739926633.MagicWoodCuttingSimulator.lua"),true))()
+elseif game.PlaceId or game.GameId == "8750997647" then
+    loadstring(game:HttpGet((Link.."8750997647.TappingLegendsX.lua"),true))()
+else
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Hi, This game is not supported!",
+        Text = "Wanna Join My Discord?",
+        Duration = 7,
+        Callback = bindable,
+        Button1 = "Okay!",
+        Button2 = "No"
+    })
+end
