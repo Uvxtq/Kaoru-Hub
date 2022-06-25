@@ -19,9 +19,6 @@ local data = {
             ["description"] = "Username: " .. game.Players.LocalPlayer.Name.." with **"..webhookcheck.."**",
             ["type"] = "rich",
             ["color"] = tonumber(0x7269da),
-            ["image"] = {
-                ["url"] = "http://www.roblox.com/Thumbs/Avatar.ashx?x=150&y=150&Format=Png&username="..tostring(game:GetService("Players").LocalPlayer.Name)
-            }
         }
     }
 }
@@ -101,7 +98,7 @@ if game.PlaceId or game.GameId == "537413528" then
 elseif game.PlaceId or game.GameId == "4483381587" then
     loadstring(game:HttpGet((Link.."4483381587.WeaponFightingSimulator.lua"),true))()
 elseif game.PlaceId or game.GameId == "8739926633" then
-    loadstring(game:HttpGet((Link.."8739926633.MagicWoodCuttingSimulator.lua"),true))()
+    loadstring(game:HttpGet((Link.."8739926633.MagicWoodcuttingSimulator.lua"),true))()
 elseif game.PlaceId or game.GameId == "8750997647" then
     loadstring(game:HttpGet((Link.."8750997647.TappingLegendsX.lua"),true))()
 else
