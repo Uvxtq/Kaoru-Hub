@@ -16,7 +16,7 @@ local TweenService = service("TweenService")
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 pcall(function()
-	for i,v in pairs(getconnections(Players.Idled)) do
+	for i,v in pairs(getconnections(LocalPlayer.Idled)) do
 		v:Disable()
 	end
 end)
